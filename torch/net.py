@@ -53,3 +53,4 @@ print(net.conv1.bias.grad)
 learning_rate = 0.5
 for f in net.parameters():
     f.data.sub_(f.grad.data * learning_rate)
+ttttt
