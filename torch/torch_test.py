@@ -2,8 +2,10 @@ from __future__ import  print_function
 import torch
 from torch.autograd import Variable
 
-x=Variable(torch.ones(2,2),requires_grad=True)
-y=x+2
-z=y*y*3
-out=z.mean()
-print(z,out,x,y)
+def fn_add(x,y):
+    x=x+y
+
+x=5
+y=10
+fn_add(x,y)
+print(x)
