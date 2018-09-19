@@ -11,18 +11,27 @@ def get_img():
 def show_imgs(img_list):
     plt.figure('compare')
     num=0
+    series=231
     for img in img_list:
-        plt.subplot(231)
+        plt.subplot(series)
         plt.imshow(img, cmap='gray')
-        plt.show()
-
-def svd(array):
-    U,sigma,Vt=np.linalg.svd(array,full_matrices=False)
-    print(sigma)
+        series=series+1
+        num=num+1
+    plt.show()
 
 
 if __name__ == '__main__':
     img=get_img()
-    svd(img)
+    U,sigma,Vt=np.linalg.svd(img,full_matrices=False)
+    img_list=[]
+    img_list.append(img)
+    sig=np.zeros(sigma.shape)
+    for i in range(1,101,20):
+        for j in range(i):
+            sig[j]=sigma[j]
+        new_img=np.dot(U*sig,Vt)
+        img_list.append(new_img)
+    show_imgs(img_list)
+
 
 
