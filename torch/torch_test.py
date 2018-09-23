@@ -26,7 +26,7 @@ if __name__ == '__main__':
     img_list=[]
     img_list.append(img)
     sig=np.zeros(sigma.shape)
-    for i in range(1,101,20):
+    for i in range(1,51,10):
         for j in range(i):
             sig[j]=sigma[j]
         new_img=np.dot(U*sig,Vt)
