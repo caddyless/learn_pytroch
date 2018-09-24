@@ -27,7 +27,6 @@ def parse(str_x):
     for i in range(3):
         x[2 - i] = int(str_x % 1000)
         str_x = int(str_x / 1000)
-    print(x)
     return x
 
 
@@ -36,26 +35,28 @@ def img_show(im):
     plt.show()
 
 
-def img_change(im, edge):
-    ser = np.arange(edge)
-    random.shuffle(ser)
+def img_change(im, edge,seed=[]):
+    if len(seed)==0:
+        seed = np.arange(edge)
+        random.shuffle(seed)
     iden = np.zeros((edge, edge))
     for i in range(edge):
-        iden[i][ser[i]] = 1
-    new_im = np.zeros(im.shape[:1])
+        iden[i][seed[i]] = 1
+    new_im = np.zeros(im.shape[:2])
+    new_img=np.zeros(im.shape)
     for i in range(edge):
         for j in range(edge):
             new_im[i][j] = create(im[i][j])
-    new_im = iden * new_im
+    new_im = iden.dot(new_im)
     for i in range(edge):
         for j in range(edge):
             for k in range(3):
-                im[i][j][k] = parse(new_im[i][j])[k]
-    return im
+                new_img[i][j][k] = parse(new_im[i][j])[k]
+    return new_img,seed
 
 
 if __name__ == '__main__':
     im, minmal = get_img()
-
-    im = img_change(im, minmal)
-    img_show(im)
+    new,seed = img_change(im, minmal)
+    newer=img_change(new,minmal,seed)
+    img_show(newer)
