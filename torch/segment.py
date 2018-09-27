@@ -1,15 +1,30 @@
 import numpy as np
 import matplotlib.pylab as plt
 import random
-import scipy.misc
+import os
+import turicreate as tc
+import scipy.misc as mc
 
+rootdir='/home/qualcomm/101_ObjectCategories'
+dstdir='/home/qualcomm/seg_images'
 
 def get_img():
-    im = plt.imread('beauty.jpg')
-    shape = im.shape
-    minmal = min(shape[:2])
-    im = im[:minmal, :minmal]
-    return im, minmal
+    folder_list=os.listdir(rootdir)
+    for folder in folder_list:
+        sour_path=os.path.join(rootdir,folder)
+        dst_path=os.path.join(dst_path,folder)
+        image_list=os.listdir(sour_path)
+        for img in image_list:
+            im = plt.imread(os.path.join(sour_path,im))
+            shape = im.shape
+            minmal = min(shape[:2])
+            im = im[:minmal, :minmal]
+            new_im,seed=img_change(im,minmal)
+            assert new_im.shape[2]==3
+            if not os.path.isdir(dst_path):
+                os.makedirs(dst_path)
+            mc.imsave(os.path.join(dst_path, img))
+    return
 
 
 def create(x):
@@ -31,19 +46,24 @@ def parse(str_x):
 
 
 def img_show(img):
-    seat = 121
+    seat=121
     for im in img:
         plt.figure('compare')
         plt.subplot(seat)
         plt.imshow(im)
-        seat = seat + 1
+        seat=seat+1
     plt.show()
+
+
+def generate_seed(edge):
+    seed = np.arange(edge)
+    random.shuffle(seed)
+    return seed
 
 
 def img_change(im, edge, seed=[]):
     if len(seed) == 0:
-        seed = np.arange(edge)
-        random.shuffle(seed)
+        seed=generate_seed(edge)
     iden = np.zeros((edge, edge))
     for i in range(edge):
         iden[i][seed[i]] = 1
@@ -57,12 +77,9 @@ def img_change(im, edge, seed=[]):
         for j in range(edge):
             for k in range(3):
                 new_img[i][j][k] = parse(new_im[i][j])[k]
-    return new_img, seed
+    img=new_img.astype(np.uint8)
+    return img, seed
 
 
 if __name__ == '__main__':
-    im, minmal = get_img()
-    new, seed = img_change(im, minmal)
-    new = new.astype(np.uint8)
-    img = [im, new]
-    img_show(img)
+    get_img()
