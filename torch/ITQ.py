@@ -1,8 +1,35 @@
 import numpy as np
+from termcolor import colored
 
 
 def relu(x):
     return np.maximum(x, 0.)
+
+def space(*kwargs):
+    strarr = arr2strarr(*kwargs)
+    return ' '.join(strarr)
+
+
+def arr2strarr(*kwargs):
+    mylist = []
+    for i in kwargs:
+        if isinstance(i, str):
+            mylist.append(i)
+            continue
+        mylist.append(str(i))
+    return mylist
+
+
+def epscheck(x, tol=5):
+    tmp = np.any(np.abs(x) > 10**tol)
+    if tmp:
+        redprint('1e'+str(tol)+' exceed')
+
+def red(sentence):
+    return colored(sentence, 'red')
+
+def redprint(sentence):
+    print(red(space(sentence)))
 
 
 def ITQ_decompose(

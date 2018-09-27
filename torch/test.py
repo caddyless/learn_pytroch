@@ -30,12 +30,12 @@ def parse(str_x):
 
 
 def img_show(img):
-    seat=121
+    seat = 121
     for im in img:
         plt.figure('compare')
         plt.subplot(seat)
         plt.imshow(im)
-        seat=seat+1
+        seat = seat + 1
     plt.show()
 
 
@@ -61,10 +61,7 @@ def img_change(im, edge, seed=[]):
 
 if __name__ == '__main__':
     im, minmal = get_img()
-    # seed=np.arange(0,minmal,1)
-    # seed[0]=1
-    # seed[1]=0
     new, seed = img_change(im, minmal)
-    new=new.astype(np.uint8)
-    img=[im,new]
+    new = new.astype(np.uint8)
+    img = [im, new]
     img_show(img)

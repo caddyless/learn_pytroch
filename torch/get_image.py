@@ -15,6 +15,7 @@ def imshow(img):
     plt.imshow(np.transpose(npimg, (1, 2, 0)))
     plt.show()
 
+
 def download_img():
     transform = transforms.Compose(
         [transforms.ToTensor(),
@@ -37,9 +38,9 @@ def download_img():
     # print labels
     print(' '.join('%5s' % classes[labels[j]] for j in range(4)))
 
-    return trainloader,testloader
+    return trainloader, testloader
 
 
 if __name__ == '__main__':
-    #download cifar10
-    trainset,testset=download_img()
+    # download cifar10
+    trainset, testset = download_img()

@@ -1,10 +1,17 @@
-import torch
 from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+import torchvision
 import get_image
+import matplotlib.pyplot as plt
+import numpy as np
+import torch
 
+
+
+classes = ('plane', 'car', 'bird', 'cat',
+           'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
 class Net(nn.Module):
     def __init__(self):
@@ -35,6 +42,14 @@ class Net(nn.Module):
         for s in size:
             num_features *= s
         return num_features
+
+
+def imshow(img):
+    img = img / 2 + 0.5     # unnormalize
+    npimg = img.numpy()
+    plt.imshow(np.transpose(npimg, (1, 2, 0)))
+    plt.show()
+
 
 
 def train_net(trainloader,net):
@@ -71,7 +86,16 @@ def train_net(trainloader,net):
 
 def test(testloader):
     dateiter=iter(testloader)
-    images,label=dateiter.next()
+    images,labels=dateiter.next()
+
+    # print images
+    imshow(torchvision.utils.make_grid(images))
+    print('GroundTruth: ', ' '.join('%5s' % classes[labels[j]] for j in range(4)))
+    outputs = net(Variable(images))
+    predicted = torch.max(outputs.data, 1)
+    print('Predicted: ', ' '.join('%5s' % classes[predicted[1][j]]
+                                  for j in range(4)))
+
 
 if __name__ == '__main__':
     net = Net()
