@@ -122,6 +122,6 @@ def img_change(im, shape, seed):
 
 
 if __name__ == '__main__':
-    fra=[100,50,25,10]
+    fra = [100, 50, 25, 10]
     for f in fra:
         get_img(fra)
