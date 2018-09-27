@@ -248,7 +248,9 @@ def ITQ_decompose(feature, gt_feature, weight, rank, bias=None, DEBUG=False, Wr=
                 loss = error(Z, relu(U))
                 print("loss", loss, "rel", rel_error(Z, relu(U)))
 
+
     # process output
+
     L, sigma, R = svd(T)
     #L, sigma, R = np.linalg.svd(T,0)
     L = L[:, :rank]

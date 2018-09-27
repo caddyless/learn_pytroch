@@ -1,10 +1,32 @@
 import numpy as np
-
+from termcolor import colored
 
 def relu(x):
     return np.maximum(x, 0.)
 
+def epscheck(x, tol=5):
+    tmp = np.any(np.abs(x) > 10**tol)
+    if tmp:
+        redprint('1e'+str(tol)+' exceed')
 
+def redprint(sentence):
+    print(red(space(sentence)))
+
+def red(sentence):
+    return colored(sentence, 'red')
+
+def space(*kwargs):
+    strarr = arr2strarr(*kwargs)
+    return ' '.join(strarr)
+
+def error(A, B):
+    return np.mean((A - B)**2)**.5
+
+def rel_error(A, B):
+    return np.mean((A - B)**2)**.5 / np.mean(A**2)**.5
+
+
+# 输入分别为特征图(ndarray)，，权重(ndarray)，秩，偏差
 def ITQ_decompose(
         feature,
         gt_feature,
@@ -30,9 +52,12 @@ def ITQ_decompose(
         # r(yi)
         Z = relu(gt_feature)
     Zsq = Z**2
+
+    # 中值化操作
     Y_mean = Y.mean(0)
     # Y
     G = Y - Y_mean
+
     # (Y'Y)^-1
     PG = (G.T).dot(G)
     if 0:
@@ -104,6 +129,7 @@ def ITQ_decompose(
                 print("loss", loss, "rel", rel_error(Z, relu(U)))
 
     # process output
+    # 满秩分解
     L, sigma, R = svd(T)
     #L, sigma, R = np.linalg.svd(T,0)
     L = L[:, :rank]
