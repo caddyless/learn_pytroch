@@ -3,22 +3,28 @@ import matplotlib.pylab as plt
 import random
 import os
 import turicreate as tc
+import scipy.misc as mc
 
 rootdir='/home/qualcomm/101_ObjectCategories'
-
+dstdir='/home/qualcomm/seg_images'
 
 def get_img():
     folder_list=os.listdir(rootdir)
     for folder in folder_list:
-        path=os.path.join(rootdir,folder)
-        image_list=os.listdir(path)
+        sour_path=os.path.join(rootdir,folder)
+        dst_path=os.path.join(dst_path,folder)
+        image_list=os.listdir(sour_path)
         for img in image_list:
-            im = plt.imread(os.path.join(path,im))
+            im = plt.imread(os.path.join(sour_path,im))
             shape = im.shape
             minmal = min(shape[:2])
             im = im[:minmal, :minmal]
-            new_im=img_change(im,minmal)
-    return im, minmal
+            new_im,seed=img_change(im,minmal)
+            assert new_im.shape[2]==3
+            if not os.path.isdir(dst_path):
+                os.makedirs(dst_path)
+            mc.imsave(os.path.join(dst_path, img))
+    return
 
 
 def create(x):
@@ -49,10 +55,15 @@ def img_show(img):
     plt.show()
 
 
+def generate_seed(edge):
+    seed = np.arange(edge)
+    random.shuffle(seed)
+    return seed
+
+
 def img_change(im, edge, seed=[]):
     if len(seed) == 0:
-        seed = np.arange(edge)
-        random.shuffle(seed)
+        seed=generate_seed(edge)
     iden = np.zeros((edge, edge))
     for i in range(edge):
         iden[i][seed[i]] = 1
@@ -71,7 +82,4 @@ def img_change(im, edge, seed=[]):
 
 
 if __name__ == '__main__':
-    im, minmal = get_img()
-    new, seed = img_change(im, minmal)
-    img=[im,new]
-    img_show(img)
+    get_img()

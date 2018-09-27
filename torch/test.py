@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pylab as plt
 import random
+import scipy.misc
 
 
 def get_img():
