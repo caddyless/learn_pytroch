@@ -1,33 +1,50 @@
 import numpy as np
 from termcolor import colored
 
+
 def relu(x):
     return np.maximum(x, 0.)
+
 
 def epscheck(x, tol=5):
     tmp = np.any(np.abs(x) > 10**tol)
     if tmp:
-        redprint('1e'+str(tol)+' exceed')
+        redprint('1e' + str(tol) + ' exceed')
+
+
+def arr2strarr(*kwargs):
+    mylist = []
+    for i in kwargs:
+        if isinstance(i, str):
+            mylist.append(i)
+            continue
+        mylist.append(str(i))
+    return mylist
+
 
 def redprint(sentence):
     print(red(space(sentence)))
 
+
 def red(sentence):
     return colored(sentence, 'red')
+
 
 def space(*kwargs):
     strarr = arr2strarr(*kwargs)
     return ' '.join(strarr)
 
+
 def error(A, B):
     return np.mean((A - B)**2)**.5
+
 
 def rel_error(A, B):
     return np.mean((A - B)**2)**.5 / np.mean(A**2)**.5
 
 
 # 输入分别为特征图(ndarray)，，权重(ndarray)，秩，偏差
-def ITQ_decompose(
+def ITQ_decompoes(
         feature,
         gt_feature,
         weight,
