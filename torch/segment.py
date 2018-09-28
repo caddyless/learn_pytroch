@@ -7,7 +7,7 @@ import scipy.misc as mc
 import math
 
 rootdir = '/home/qualcomm/101_ObjectCategories'
-dstdir = '/home/qualcomm/seg_images'
+dstdir = '/home/qualcomm/new_seg_images'
 
 
 def get_img(fraction=100):
@@ -26,14 +26,13 @@ def get_img(fraction=100):
                 print(folder + ' ' + img + 'abandoned')
                 continue
             print(folder + ' ' + img)
-            minmal = min(shape[:2])
-            im = im[:minmal, :minmal]
             seed = generate_seed(shape, ser, fraction)
             new_im = img_change(im, shape, seed)
-            assert new_im.shape[2] == 3
+            assert new_im.shape[2] == 3 ,'shape not equal to 3'
             if not os.path.isdir(dst_path):
                 os.makedirs(dst_path)
-            mc.imsave(os.path.join(dst_path, img))
+            mc.imsave(os.path.join(dst_path, img),new_im)
+        print(str(fraction)+' '+folder+' complete')
     return
 
 
@@ -71,12 +70,12 @@ def img_show(img):
 def generate_seed(shape, ser, fractions=100):
     assert len(shape) == 3
     f = fractions
-    granularity = math.floor(shape[0] / f)
+    granularity = int(math.floor(shape[0] / f))
     g = granularity
     m = f - shape[0] % f
     n = shape[0] % f
     assert m * g + n * (g + 1) == shape[0]
-    seed = np.zeros((shape[0]))
+    seed = [0 for i in range(shape[0])]
     index = 0
     for item in ser:
         if item < m:
@@ -92,19 +91,22 @@ def generate_seed(shape, ser, fractions=100):
             print('start越界')
             assert 0
         for i in range(k):
-            seed[index] = start + i
-            index += 1
+            seed[index] = int(start + i)
+            assert isinstance(int(start+i),int),'what the fuck'
+            assert isinstance(seed[index],int) , 'seed type error in generate function'
+            index = index + 1
             if index >= shape[0]:
                 break
+    assert len(seed)==shape[0],'seed length error in generate function'
     return seed
 
 
 def img_change(im, shape, seed):
     assert len(shape) == 3
-    if len(seed) == 0:
-        seed = generate_seed(shape)
+    assert len(seed)==shape[0],'seed length error'
     iden = np.zeros((shape[0], shape[0]))
     for i in range(shape[0]):
+        assert isinstance(seed[i],int),'seed[i] type error'
         iden[i][seed[i]] = 1
     new_im = np.zeros(im.shape[:2])
     new_img = np.zeros(im.shape)
@@ -124,4 +126,4 @@ def img_change(im, shape, seed):
 if __name__ == '__main__':
     fra = [100, 50, 25, 10]
     for f in fra:
-        get_img(fra)
+        get_img(f)
