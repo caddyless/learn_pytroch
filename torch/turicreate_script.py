@@ -32,7 +32,7 @@ def compare_img(origin_results, current_results):
         current), 'len(origin_results) are not equal to len(current_results)'
     length = len(origin)
     for i in range(length):
-        flag = (origin[i][-8:-5] == current[i][-8:-5])
+        flag = (origin[i] == current[i])
         if flag:
             continue
         print(flag)
@@ -45,7 +45,7 @@ def query(path):
     reference_data, model = create_mod(path)
     query_results = model.query(
         reference_data[reference_data['path'] == name], k=10)
-    path_list = [reference_data[result['reference_label']]['path']
+    path_list = [reference_data[result['reference_label']]['path'][-14:-1]
                  for result in query_results]
     return path_list
 
