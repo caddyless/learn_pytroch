@@ -54,7 +54,7 @@ if __name__ == '__main__':
     tc.config.set_num_gpus(-1)
     origin_results = query(origin_dir)
     folders = os.listdir(source_dir)
-    bool_list=[]
+    bool_list = []
     for folder in folders:
         path = os.path.join(source_dir, folder)
         current_results = query(path)
