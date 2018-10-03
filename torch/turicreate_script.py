@@ -8,14 +8,14 @@ origin_dir = '/home/qualcomm/101_ObjectCategories'
 def create_mod(path):
     if os.path.isfile(path + '/data.sframe'):
         print('reference_data is existed')
-        reference_data = turicreate.load_sframe(path + '/data.sframe')
+        reference_data = tc.load_sframe(path + '/data.sframe')
     else:
         # Load images from the downloaded data
         reference_data = tc.image_analysis.load_images(path)
         reference_data = reference_data.add_row_number()
     if os.path.isfile(path + '/savedmodel.model'):
         print('mod is existed')
-        model = turicreate.load_model(path + '/savedmodel.model')
+        model = tc.load_model(path + '/savedmodel.model')
     else:
         # Save the SFrame for future use
         reference_data.save(path + '/data.sframe')
@@ -35,7 +35,7 @@ def compare_img(origin_results,current_results):
         if flag:
             continue
         print(flag)
-        return 
+        return
 
 
 
@@ -47,7 +47,7 @@ def query(path):
 
 
 if __name__ == '__main__':
-    turicreate.config.set_num_gpus(-1)
+    tc.config.set_num_gpus(-1)
     origin_results=query(origin_dir)
     folders = os.listdir(source_dir)
     for folder in folders:
