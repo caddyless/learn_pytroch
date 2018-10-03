@@ -36,7 +36,8 @@ def compare_img(origin_results, current_results):
         if flag:
             continue
         print(flag)
-        return
+        return False
+    return True
 
 
 def query(path):
@@ -53,7 +54,9 @@ if __name__ == '__main__':
     tc.config.set_num_gpus(-1)
     origin_results = query(origin_dir)
     folders = os.listdir(source_dir)
+    bool_list=[]
     for folder in folders:
         path = os.path.join(source_dir, folder)
         current_results = query(path)
-        compare_img(origin_results, current_results)
+        bool_list.append(compare_img(origin_results, current_results))
+    print(bool_list)
