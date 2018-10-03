@@ -9,9 +9,9 @@ import numpy as np
 import torch
 
 
-
 classes = ('plane', 'car', 'bird', 'cat',
            'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+
 
 class Net(nn.Module):
     def __init__(self):
@@ -28,8 +28,14 @@ class Net(nn.Module):
         self.fc3 = nn.Linear(84, 10)
 
     def forward(self, x):
-        x = self.pool(F.relu(self.conv1(x)))
-        x = self.pool(F.relu(self.conv2(x)))
+        x = self.conv1(x)
+        x = F.relu(x)
+        x = self.pool(x)
+        x = self.conv2(x)
+        x = F.relu(x)
+        x = self.pool(x)
+        # x = self.pool(F.relu(self.conv1(x)))
+        # x = self.pool(F.relu(self.conv2(x)))
         x = x.view(-1, 16 * 5 * 5)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
@@ -51,8 +57,7 @@ def imshow(img):
     plt.show()
 
 
-
-def train_net(trainloader,net):
+def train_net(trainloader, net):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
     for epoch in range(2):  # loop over the dataset multiple times
@@ -85,12 +90,13 @@ def train_net(trainloader,net):
 
 
 def test(testloader):
-    dateiter=iter(testloader)
-    images,labels=dateiter.next()
+    dateiter = iter(testloader)
+    images, labels = dateiter.next()
 
     # print images
     imshow(torchvision.utils.make_grid(images))
-    print('GroundTruth: ', ' '.join('%5s' % classes[labels[j]] for j in range(4)))
+    print('GroundTruth: ', ' '.join('%5s' %
+                                    classes[labels[j]] for j in range(4)))
     outputs = net(Variable(images))
     predicted = torch.max(outputs.data, 1)
     print('Predicted: ', ' '.join('%5s' % classes[predicted[1][j]]
@@ -99,7 +105,5 @@ def test(testloader):
 
 if __name__ == '__main__':
     net = Net()
-    trainloader,testloader=get_image.download_img()
-    train_net(trainloader,net)
-
-
+    trainloader, testloader = get_image.download_img()
+    train_net(trainloader, net)
