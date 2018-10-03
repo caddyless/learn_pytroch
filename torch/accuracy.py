@@ -17,14 +17,15 @@ def get_accuracy(path='.'):
         query_results = model.query(reference_data[i:i + 1], k=2)
         path_list = [reference_data[result['reference_label']]['path'][23:-16]
                      for result in query_results]
-        print(path_list)
         assert len(path_list) == 2, 'length of path_list error'
-        if path_list[0] == path_list[1]:
+        if path_list[0] == path_list[1] or (
+            ('Faces' in path_list[0]) and (
+                'Face' in path_list[1])):
             correct += 1
         else:
             mistake += 1
         if i % 1000 == 0:
-            print(str(i+1) + ' completed!')
+            print(str(i + 1) + ' completed!')
 
     print('正确个数为:' + str(correct))
     print('错误个数为:' + str(mistake))
