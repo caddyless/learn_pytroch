@@ -24,34 +24,36 @@ def create_mod(path):
     return reference_data, model
 
 
-def compare_img(origin_results,current_results):
-    origin=origin_results
-    current=current_results
-    flag=True
-    assert len(origin)==len(current) ,'len(origin_results) are not equal to len(current_results)'
-    length=len(origin)
+def compare_img(origin_results, current_results):
+    origin = origin_results
+    current = current_results
+    flag = True
+    assert len(origin) == len(
+        current), 'len(origin_results) are not equal to len(current_results)'
+    length = len(origin)
     for i in range(length):
-        flag=(origin[i]==current[i])
+        flag = (origin[i][-8:-5] == current[i][-8:-5])
         if flag:
             continue
         print(flag)
         return
 
 
-
 def query(path):
-    name=path+'/accordion/image_0001.jpg'
-    reference_data,model=create_mod(path)
-    query_results = model.query(reference_data[reference_data['path']==name], k=10)
-    path_list=[reference_data[result['reference_label']]['path'] for result in query_results]
+    name = path + '/accordion/image_0001.jpg'
+    reference_data, model = create_mod(path)
+    query_results = model.query(
+        reference_data[reference_data['path'] == name], k=10)
+    path_list = [reference_data[result['reference_label']]['path']
+                 for result in query_results]
     return path_list
 
 
 if __name__ == '__main__':
     tc.config.set_num_gpus(-1)
-    origin_results=query(origin_dir)
+    origin_results = query(origin_dir)
     folders = os.listdir(source_dir)
     for folder in folders:
         path = os.path.join(source_dir, folder)
-        current_results=query(path)
-        compare_img(origin_results,current_results)
+        current_results = query(path)
+        compare_img(origin_results, current_results)
