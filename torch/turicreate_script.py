@@ -55,9 +55,13 @@ if __name__ == '__main__':
     origin_results = query(origin_dir)
     folders = os.listdir(source_dir)
     bool_list = []
+    image_names = []
+    image_names.append(origin_results)
     for folder in folders:
         path = os.path.join(source_dir, folder)
         current_results = query(path)
+        image_names.append(current_results)
         bool_list.append(compare_img(origin_results, current_results))
     print(bool_list)
+    print(image_names)
     print('complete')
