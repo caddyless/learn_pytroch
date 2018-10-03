@@ -25,14 +25,24 @@ def create_mod(path):
 
 
 def compare_img(origin_results,current_results):
-    o=origin_results
-    c=current_results
-    assert len(o)==len(c) ,'len(origin_results) are not equal to len(current_results)'
+    origin=origin_results
+    current=current_results
+    flag=True
+    assert len(origin)==len(current) ,'len(origin_results) are not equal to len(current_results)'
+    length=len(origin)
+    for i in range(length):
+        flag=(origin[i]['path'][-14:-1]==current[i]['path'][-14:-1])
+        if flag:
+            continue
+        print(flag)
+        return 
 
 
-def query(path,start=0,end=10,k=10):
+
+def query(path):
+    name=path+'/image_0001.jpg'
     reference_data,model=create_mod(path)
-    query_results = model.query(reference_data[0:10], k=10)
+    query_results = model.query(reference_data[reference_data['path']==name], k=10)
     return query_results
 
 
