@@ -60,3 +60,4 @@ if __name__ == '__main__':
         current_results = query(path)
         bool_list.append(compare_img(origin_results, current_results))
     print(bool_list)
+    print('complete')
