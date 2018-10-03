@@ -6,19 +6,19 @@ origin_dir = '/home/qualcomm/101_ObjectCategories'
 
 
 def create_mod(path):
-    if os.path.isfile(path + '/data.sframe'):
+    if os.path.isdir(path + '/data.sframe'):
         print('reference_data is existed')
         reference_data = tc.load_sframe(path + '/data.sframe')
     else:
         # Load images from the downloaded data
         reference_data = tc.image_analysis.load_images(path)
         reference_data = reference_data.add_row_number()
-    if os.path.isfile(path + '/savedmodel.model'):
+        reference_data.save(path + '/data.sframe')
+    if os.path.isdir(path + '/savedmodel.model'):
         print('mod is existed')
         model = tc.load_model(path + '/savedmodel.model')
     else:
         # Save the SFrame for future use
-        reference_data.save(path + '/data.sframe')
         model = tc.image_similarity.create(reference_data)
         model.save(path + '/savedmodel.model')
     return reference_data, model
@@ -31,7 +31,7 @@ def compare_img(origin_results,current_results):
     assert len(origin)==len(current) ,'len(origin_results) are not equal to len(current_results)'
     length=len(origin)
     for i in range(length):
-        flag=(origin[i]['path'][-14:-1]==current[i]['path'][-14:-1])
+        flag=(origin[i]==current[i])
         if flag:
             continue
         print(flag)
@@ -40,10 +40,11 @@ def compare_img(origin_results,current_results):
 
 
 def query(path):
-    name=path+'/image_0001.jpg'
+    name=path+'/accordion/image_0001.jpg'
     reference_data,model=create_mod(path)
     query_results = model.query(reference_data[reference_data['path']==name], k=10)
-    return query_results
+    path_list=[reference_data[result['reference_label']]['path'] for result in query_results]
+    return path_list
 
 
 if __name__ == '__main__':
