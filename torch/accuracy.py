@@ -4,10 +4,13 @@ import os
 source_dir = '/home/qualcomm'
 
 
-def get_accuracy(path='./'):
-    reference_data = tc.load_sframe(path + 'data.sframe')
+def get_accuracy(path='.'):
+    reference_data = tc.load_sframe(path + '/data.sframe')
     if os.path.isdir(path + '/savedmodel.model'):
         model = tc.load_model(path + '/savedmodel.model')
+    else:
+        model = tc.image_similarity.create(reference_data)
+        model.save(path + '/savedmodel.model')
     correct = 0
     mistake = 0
     for item in reference_data:
