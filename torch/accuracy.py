@@ -13,8 +13,8 @@ def get_accuracy(path='.'):
         model.save(path + '/savedmodel.model')
     correct = 0
     mistake = 0
-    for item in reference_data:
-        query_results = model.query(item, k=2)
+    for i in range(len(reference_data)):
+        query_results = model.query(reference_data[i:i + 1], k=2)
         path_list = [reference_data[result['reference_label']]['path'][23:-16]
                      for result in query_results]
         print(path_list)
@@ -23,6 +23,9 @@ def get_accuracy(path='.'):
             correct += 1
         else:
             mistake += 1
+        if i % 1000 == 0:
+            print(str(i+1) + ' completed!')
+
     print('正确个数为:' + str(correct))
     print('错误个数为:' + str(mistake))
     print('正确率为:' + str(correct / (correct + mistake)))
