@@ -39,7 +39,7 @@ def load_mnist(path, kind='train'):
                     root=path, label=str(
                         labels[i]), num=str(i)), images[i])
             if (i + 1) % 1000 == 0:
-                print('已完成' + str(i+1) + '张')
+                print('已完成' + str(i + 1) + '张')
     return images, labels
 
 
