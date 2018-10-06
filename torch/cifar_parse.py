@@ -3,7 +3,7 @@ import pickle
 import os
 import numpy as np
 
-filename = [
+file_list = [
     'test_batch',
     'data_batch_1',
     'data_batch_2',
@@ -24,7 +24,7 @@ class_name = [
     'truck']
 
 
-def load_file(fn=filename):
+def load_file(filename):
     with open(source_dir + 'batches.meta', 'rb') as fo:
         data = pickle.load(fo, encoding='latin1')
         for item in data['label_names']:
@@ -32,22 +32,23 @@ def load_file(fn=filename):
                 continue
             else:
                 os.makedirs(source_dir + 'pics/' + item)
+    class_num = np.zeros(10, dtype=np.uint8)
     for fn in filename:
         with open(source_dir + fn, 'rb') as fo:
             data = pickle.load(fo, encoding='latin1')
-            class_num = np.zeros((10), dtype=np.uint8)
             for i in range(len(data['data'])):
                 row = data['data'][i]
                 row = np.array(row, dtype=np.uint8)
                 img = row.reshape(32, 32, 3)
                 label = data['labels'][i]
                 path = source_dir + 'pics/' + class_name[label] + '/image_'
-                while os.path.isfile(path + str(class_num[label])+'.jpg'):
+                while os.path.isfile(path + str(class_num[label]) + '.jpg'):
                     class_num[label] += 1
-                mc.imsave(path + str(class_num[label])+'.jpg', img)
-                if (i+1)%1000==0:
-                    print(data['batch_label']+'  '+str(i+1)+' completed!')
+                mc.imsave(path + str(class_num[label]) + '.jpg', img)
+                if (i + 1) % 1000 == 0:
+                    print(data['batch_label'] + '  ' +
+                          str(i + 1) + ' completed!')
 
 
 if __name__ == '__main__':
-    load_file()
+    load_file(file_list)
