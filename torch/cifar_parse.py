@@ -45,7 +45,6 @@ def load_file(fn=filename):
                 while os.path.isfile(path + str(class_num[label])):
                     class_num[label] += 1
                 mc.imsave(path + str(class_num[label]), img)
-        return data
 
 
 if __name__ == '__main__':
