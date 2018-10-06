@@ -27,12 +27,12 @@ def get_accuracy(path='.'):
                 reference_data[index:], k=k, verbose=False)
             index = len(reference_data)
         assert len(query_results) % k == 0, 'length error!'
-        for i in range(len(query_results) / k):
+        for i in range(int(len(query_results) / k)):
             category = [reference_data[query_results[i * k + j]
-                                       ['reference_label']]['path'][23:-16] for j in range(k)]
+                                       ['reference_label']]['path'].split('/')[3] for j in range(k)]
             if category[0] == category[1] or (
                     ('Faces' in category[0]) and (
-                    'Face' in category[1])):
+                    'Faces' in category[1])):
                 correct += 1
             else:
                 mistake += 1
