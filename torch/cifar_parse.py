@@ -42,7 +42,7 @@ def load_file(fn=filename):
                 img = row.reshape(32, 32, 3)
                 label = data['labels'][i]
                 path = source_dir + 'pics/' + class_name[label] + '/image_'
-                while os.path.isfile(path + str(class_num[label])+'jpg'):
+                while os.path.isfile(path + str(class_num[label])+'.jpg'):
                     class_num[label] += 1
                 mc.imsave(path + str(class_num[label])+'.jpg', img)
                 if (i+1)%1000==0:
