@@ -2,6 +2,8 @@ import turicreate as tc
 import os
 
 source_dir = '/home/qualcomm'
+step_length = 100
+k = 2
 
 
 def get_accuracy(path='.'):
@@ -13,23 +15,37 @@ def get_accuracy(path='.'):
         model.save(path + '/savedmodel.model')
     correct = 0
     mistake = 0
-    for i in range(len(reference_data)):
-        query_results = model.query(reference_data[i:i + 1], k=2)
-        path_list = [reference_data[result['reference_label']]['path'][23:-16]
-                     for result in query_results]
-        assert len(path_list) == 2, 'length of path_list error'
-        if path_list[0] == path_list[1] or (
-            ('Faces' in path_list[0]) and (
-                'Face' in path_list[1])):
-            correct += 1
+    index = 0
+    distance = 0
+    while index < len(reference_data):
+        if index + step_length < len(reference_data):
+            query_results = model.query(
+                reference_data[index:index + step_length], k=k, verbose=False)
+            index += step_length
         else:
-            mistake += 1
-        if i % 1000 == 0:
-            print(str(i + 1) + ' completed!')
+            query_results = model.query(
+                reference_data[index:], k=k, verbose=False)
+            index = len(reference_data)
+        assert len(query_results) % k == 0, 'length error!'
+        for i in range(len(query_results) / k):
+            category = [reference_data[query_results[i * k + j]
+                                       ['reference_label']]['path'][23:-16] for j in range(k)]
+            if category[0] == category[1] or (
+                    ('Faces' in category[0]) and (
+                    'Face' in category[1])):
+                correct += 1
+            else:
+                mistake += 1
+            for j in range(k):
+                distance += query_results[i * k + j]['distance']
+
+        if (index + 1) % 1000 == 0:
+            print(str(index + 1) + ' completed!')
 
     print('正确个数为:' + str(correct))
     print('错误个数为:' + str(mistake))
     print('正确率为:' + str(correct / (correct + mistake)))
+    print('平均距离为： ' + str(distance / len(reference_data)))
 
 
 if __name__ == '__main__':
