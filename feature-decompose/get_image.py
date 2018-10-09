@@ -3,6 +3,7 @@ import torchvision
 import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 import numpy as np
+from entry import get_parameter
 
 classes = ('plane', 'car', 'bird', 'cat',
            'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
@@ -17,6 +18,7 @@ def imshow(img):
 
 
 def download_img():
+    parameter=get_parameter()
     transform = transforms.Compose(
         [transforms.ToTensor(),
          transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
@@ -25,11 +27,11 @@ def download_img():
                                             download=True, transform=transform)
     testset = torchvision.datasets.CIFAR10(root='./data', train=False,
                                            download=True, transform=transform)
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size=5,
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=parameter['batch_size'],
                                               shuffle=True, num_workers=2)
-    testloader = torch.utils.data.DataLoader(testset, batch_size=5,
+    testloader = torch.utils.data.DataLoader(testset, batch_size=parameter['batch_size'],
                                              shuffle=False, num_workers=2)
-    # # get some random training images
+    # get some random training images
     # dataiter = iter(trainloader)
     # images, labels = dataiter.next()
     #

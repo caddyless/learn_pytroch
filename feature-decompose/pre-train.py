@@ -1,47 +1,55 @@
-from torch.autograd import Variable
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-import torchvision
-import get_image
-import matplotlib.pyplot as plt
-import numpy as np
 import torch
+import torchvision as tv
+import numpy as np
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
+from torch.autograd import Variable
+import get_image
+from entry import get_parameter
+import decompose
 
-
-classes = ('plane', 'car', 'bird', 'cat',
-           'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
-d_pie1 = 3
-d_pie2 = 8
+# get parameter from a entry.py
+p = get_parameter()
+# # get samples from feature map of conv1 and conv2
+# sample_y1 = np.zeros((p['c2'], p['sample_num']))
+# sample_y2 = np.zeros((p['c3'], p['sample_num']))
+# flag of extract model
+EXTRACT = False
 
 
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        # 1 input image channel, 6 output channels, 5*5 square convolution
-        # kernel
-
-        self.conv1 = nn.Conv2d(3, 6, 5)
+        # c_in:image channel  c2:output channel of conv1  c3:output channel of conv2
+        # k: the size of filter
+        self.conv1 = nn.Conv2d(p['c_in'], p['c2'], p['k'])
         self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(6, 16, 5)
+        self.conv2 = nn.Conv2d(p['c2'], p['c3'], p['k'])
         # an affine operation: y = Wx + b
-        self.fc1 = nn.Linear(16 * 5 * 5, 120)
+        self.fc1 = nn.Linear(p['c3'] * p['k'] * p['k'], 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
 
     def forward(self, x):
         x = self.conv1(x)
+        if EXTRACT:
+            sample_y1 = x[0]
         x = F.relu(x)
         x = self.pool(x)
         x = self.conv2(x)
+        if EXTRACT:
+            sample_y2 = x[0]
         x = F.relu(x)
         x = self.pool(x)
         # x = self.pool(F.relu(self.conv1(x)))
         # x = self.pool(F.relu(self.conv2(x)))
-        x = x.view(-1, 16 * 5 * 5)
+        x = x.view(-1, p['c3'] * p['k'] * p['k'])
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
+        if EXTRACT:
+            return x, sample_y1, sample_y2
         return x
 
     def num_flat_features(self, x):
@@ -52,17 +60,10 @@ class Net(nn.Module):
         return num_features
 
 
-def imshow(img):
-    img = img / 2 + 0.5     # unnormalize
-    npimg = img.numpy()
-    plt.imshow(np.transpose(npimg, (1, 2, 0)))
-    plt.show()
-
-
-def train_net(trainloader, net):
+def train_net(trainloader, net, epoch, max, padding=1000):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-    for epoch in range(2):  # loop over the dataset multiple times
+    for e in range(epoch):  # loop over the dataset multiple times
 
         running_loss = 0.0
         for i, data in enumerate(trainloader, 0):
@@ -83,29 +84,26 @@ def train_net(trainloader, net):
 
             # print statistics
             running_loss += loss.data
-            if i % 2000 == 1999:  # print every 2000 mini-batches
+            if (i + 1) % padding == 0:  # print every padding mini-batches
                 print('[%d, %5d] loss: %.3f' %
-                      (epoch + 1, i + 1, running_loss / 2000))
+                      (epoch, i + 1, running_loss / padding))
                 running_loss = 0.0
-
-    print('Finished Training')
-
-
-def test(testloader):
-    dateiter = iter(testloader)
-    images, labels = dateiter.next()
-
-    # print images
-    imshow(torchvision.utils.make_grid(images))
-    print('GroundTruth: ', ' '.join('%5s' %
-                                    classes[labels[j]] for j in range(4)))
-    outputs = net(Variable(images))
-    predicted = torch.max(outputs.data, 1)
-    print('Predicted: ', ' '.join('%5s' % classes[predicted[1][j]]
-                                  for j in range(4)))
+            if not max==None:
+                if (i + 1) > max:
+                    break
 
 
 if __name__ == '__main__':
     net = Net()
     trainloader, testloader = get_image.download_img()
-    train_net(trainloader, net)
+    train_net(trainloader, net, epoch=1, max=3000)
+    print('re-train finish!')
+    print('feature extract begin!')
+    EXTRACT = True
+    inputs, labels = testloader[1000]
+    outputs, sample_y1, sample_y2 = net(inputs)
+    EXTRACT = False
+    params = net.state_dict()
+    weight = params['conv1.weight']
+    bias = params['conv1.bias']
+    decompose.feature_decompose(sample_y1, weight, bias)

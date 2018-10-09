@@ -1,3 +1,7 @@
 import numpy as np
-s='woshiniba/nini/ma'
-print(s.split('/')[2])
+import ITQ
+
+a=[[1,2],[2,3],[4,5]]
+a=np.array(a)
+a=a.reshape(2,3)
+print(a)

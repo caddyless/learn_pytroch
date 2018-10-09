@@ -1,5 +1,12 @@
 import numpy as np
+import scipy
 from termcolor import colored
+
+
+def pinv(x):
+    # return np.linalg.pinv(x, max(x.shape) * np.spacing(np.linalg.norm(x)))
+    # return scipy.linalg.pinv(x, max(x.shape) * np.spacing(np.linalg.norm(x)))
+    return scipy.linalg.pinv(x, 1e-6)
 
 
 def relu(x):
@@ -53,14 +60,14 @@ def ITQ_decompoes(
         DEBUG=False,
         Wr=None):
 
-    n_ins = feature.shape[0]
-    n_filter_channels = feature.shape[1]
+    n_ins = feature.shape[0]  # 输入通道数
+    n_filter_channels = feature.shape[1]  # 滤波器数量
     assert gt_feature.shape[0] == n_ins
     assert gt_feature.shape[1] == n_filter_channels
 
     # do itq
-    if 0:
-        Y_div = n_ins * feature.std()  # * n_filter_channels
+    if 0:  # 相当于batch norm操作
+        Y_div = n_ins * feature.std()  # * n_filter_channels feature的标准差
         Y = feature.copy() / Y_div
         # r(yi)
         Z = relu(gt_feature) / Y_div
@@ -73,10 +80,10 @@ def ITQ_decompoes(
     # 中值化操作
     Y_mean = Y.mean(0)
     # Y
-    G = Y - Y_mean
+    G = Y - Y_mean# 使得G的均值为0
 
     # (Y'Y)^-1
-    PG = (G.T).dot(G)
+    PG = (G.T).dot(G)  # G的转置乘以G
     if 0:
         print(np.linalg.cond(PG))
         embed()
@@ -88,7 +95,7 @@ def ITQ_decompoes(
     # epscheck(PG,9)
     # epscheck(PG,10)
 
-    PGGt = PG.dot(G.T)
+    PGGt = PG.dot(G.T)  # 相当于GT*G*GT
 
     # init U as Y
     UU = G.copy()
