@@ -21,11 +21,11 @@ class Net(nn.Module):
         # 1 input image channel, 6 output channels, 5*5 square convolution
         # kernel
 
-        self.conv1W = nn.Conv2d(3, 3, 5,bias=True)
-        self.conv1P=nn.Conv2d(3,6,1,bias=True)
+        self.conv1W = nn.Conv2d(3, 3, 5, bias=True)
+        self.conv1P = nn.Conv2d(3, 6, 1, bias=True)
         self.pool = nn.MaxPool2d(2, 2)
-        self.conv2W = nn.Conv2d(6, 8, 5,bias=True)
-        self.conv2P=nn.Conv2d(8,16,1,bias=True)
+        self.conv2W = nn.Conv2d(6, 8, 5, bias=True)
+        self.conv2P = nn.Conv2d(8, 16, 1, bias=True)
         # an affine operation: y = Wx + b
         self.fc1 = nn.Linear(16 * 5 * 5, 120)
         self.fc2 = nn.Linear(120, 84)

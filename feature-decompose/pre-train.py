@@ -95,15 +95,17 @@ def train_net(trainloader, net, epoch, max, padding=1000):
 
 if __name__ == '__main__':
     net = Net()
-    trainloader, testloader = get_image.download_img()
-    train_net(trainloader, net, epoch=1, max=3000)
-    print('re-train finish!')
+    trainloader, testloader = get_image.download_img('train')
+    train_net(trainloader, net, epoch=1, max=None)
+    print('train finish!')
     print('feature extract begin!')
     EXTRACT = True
-    inputs, labels = testloader[1000]
-    outputs, sample_y1, sample_y2 = net(inputs)
+    dateiter = iter(testloader)
+    images, labels = dateiter.next()
+    outputs, sample_y1, sample_y2 = net(images)
     EXTRACT = False
     params = net.state_dict()
     weight = params['conv1.weight']
     bias = params['conv1.bias']
-    decompose.feature_decompose(sample_y1, weight, bias)
+    sy1 = sample_y1.data.numpy()
+    decompose.feature_decompose(sy1, weight, bias, p['c2'])

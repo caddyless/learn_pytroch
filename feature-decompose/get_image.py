@@ -17,7 +17,7 @@ def imshow(img):
     plt.show()
 
 
-def download_img():
+def download_img(model='train'):
     parameter=get_parameter()
     transform = transforms.Compose(
         [transforms.ToTensor(),
@@ -31,6 +31,7 @@ def download_img():
                                               shuffle=True, num_workers=2)
     testloader = torch.utils.data.DataLoader(testset, batch_size=parameter['batch_size'],
                                              shuffle=False, num_workers=2)
+    samples = torch.utils.data.RandomSampler(trainset, num_samples=3000)
     # get some random training images
     # dataiter = iter(trainloader)
     # images, labels = dataiter.next()
@@ -39,10 +40,15 @@ def download_img():
     # imshow(torchvision.utils.make_grid(images))
     # # print labels
     # print(' '.join('%5s' % classes[labels[j]] for j in range(4)))
-
-    return trainloader, testloader
+    if model=='train':
+        return trainloader, testloader
+    if model=='sample':
+        return samples
+    else:
+        print('argument error')
+        return
 
 
 if __name__ == '__main__':
     # download cifar10
-    trainset, testset = download_img()
+    trainset, testset = download_img('train')

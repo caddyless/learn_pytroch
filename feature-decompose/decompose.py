@@ -11,14 +11,19 @@ def get_M(samples):
     eigenvalue, eigenvector = np.linalg.eig(YYT)
     print('特征值为:' + str(eigenvalue))
     print('特征向量为:' + str(eigenvector))
-    return
+    energy = []
+    for i in range(len(eigenvalue)):
+        energy.append(eigenvalue[:i + 1].sum() / eigenvalue.sum())
+    Ud_pie = eigenvector[:3].T
+    M = Ud_pie.dot(Ud_pie.T)
+    return M
 
 
-def feature_decompose(samples, w, bias):
-    sy1 = np.array(samples)
-    sy1 = sy1.reshape(par['c2'], -1)
-    get_M(sy1)
-    return
+def feature_decompose(samples, w, bias,channel):
+    samples=samples.reshape(channel,-1)
+    samples=samples-samples.mean(0)
+    M=get_M(samples)
+    return M
 
 
 if __name__ == '__main__':
