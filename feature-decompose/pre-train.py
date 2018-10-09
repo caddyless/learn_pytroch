@@ -8,6 +8,7 @@ from torch.autograd import Variable
 import get_image
 from entry import get_parameter
 import decompose
+import os
 
 # get parameter from a entry.py
 p = get_parameter()
@@ -61,6 +62,10 @@ class Net(nn.Module):
 
 
 def train_net(trainloader, net, epoch, max, padding=1000):
+    if os.path.isfile('net_params.pkl'):
+        print('model is existed')
+        net.load_state_dict(torch.load('net_params.pkl'))
+        return
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
     for e in range(epoch):  # loop over the dataset multiple times
@@ -86,26 +91,33 @@ def train_net(trainloader, net, epoch, max, padding=1000):
             running_loss += loss.data
             if (i + 1) % padding == 0:  # print every padding mini-batches
                 print('[%d, %5d] loss: %.3f' %
-                      (epoch, i + 1, running_loss / padding))
+                      (e, i + 1, running_loss / padding))
                 running_loss = 0.0
-            if not max==None:
+            if not max == None:
                 if (i + 1) > max:
                     break
+    torch.save(net.state_dict(), 'net_params.pkl')
+    print('train finish!')
 
 
 if __name__ == '__main__':
     net = Net()
     trainloader, testloader = get_image.download_img('train')
-    train_net(trainloader, net, epoch=1, max=None)
-    print('train finish!')
+    train_net(trainloader, net, epoch=2, max=None)
+
     print('feature extract begin!')
     EXTRACT = True
-    dateiter = iter(testloader)
-    images, labels = dateiter.next()
-    outputs, sample_y1, sample_y2 = net(images)
+    samples_y1 = []
+    samples_y2 = []
+    for i, data in enumerate(testloader, 0):
+        if i >= 300/p['batch_size']:
+            break
+        images, label = data
+        outputs, sy1, sy2 = net(images)
+        samples_y1.append(sy1.data.numpy())
+        samples_y2.append(sy2.data.numpy())
     EXTRACT = False
     params = net.state_dict()
-    weight = params['conv1.weight']
-    bias = params['conv1.bias']
-    sy1 = sample_y1.data.numpy()
-    decompose.feature_decompose(sy1, weight, bias, p['c2'])
+    weight = np.array(params['conv1.weight'])
+    bias = np.array(params['conv1.bias'])
+    decompose.feature_decompose(samples_y1, weight, bias, p['c2'])
